@@ -1,9 +1,11 @@
 #include <iostream>
+#include <cstring>
 
 #include "Token.hpp"
 #include "Tokenizer.hpp"
 #include "Parser.hpp"
-
+#include "Globals.hpp"
+bool verbose;
 
 // Prints each token and the number of lines in the input file.
 void identifyTokens(Tokenizer tokenizer) {
@@ -22,27 +24,42 @@ void identifyTokens(Tokenizer tokenizer) {
 }
 
 
-int main(int argc, char *argv[]) {
-
-    if (argc != 2) {
-        std::cout << "usage: " << argv[0] << " nameOfAnInputFile\n";
+int main(int argc, const char *argv[]) {
+	
+    if (argc == 1 || argc > 3 || (argc == 2 && strcmp(argv[1], "-v") == 0)) {
+        std::cout << "Usage: ./python.exe [-v] <path>\n";
+		std::cout << "-v is optional, include it to enable verbose mode, mainly for debugging\n";
         exit(1);
-    }
-
+	} else if (argc == 3) {
+		if (strcmp(argv[1], "-v") == 0) {
+			verbose = true;
+			argv[1] = argv[2];
+		} else if (strcmp(argv[2], "-v") == 0) {
+			verbose = true;
+		}
+		else {
+			std::cout << "Usage: ./python.exe [-v] <path>\n";
+			std::cout << "-v is optional, include it to enable verbose mode, mainly for debugging\n";
+			exit(1);
+		}
+	}
+	
     std::ifstream inputStream;
 
     inputStream.open(argv[1], std::ios::in);
     if (!inputStream.is_open()) {
-        std::cout << "Unable top open " << argv[1] << ". Terminating...";
-        perror("Error when attempting to open the input file.");
+        std::cout << "Unable to open " << argv[1] << ". Terminating...\n";
+        perror("Error when attempting to open the input file");
         exit(2);
     }
 
-    Tokenizer tokenizer1(inputStream);
-    identifyTokens(tokenizer1);
-    // Reset inputStream
-    inputStream.clear();
-    inputStream.seekg(0);
+	if (verbose) {
+		Tokenizer tokenizer1(inputStream);
+		identifyTokens(tokenizer1);
+		// Reset inputStream
+		inputStream.clear();
+		inputStream.seekg(0);
+	}
 
     Tokenizer tokenizer(inputStream);
     Functions *funcs = new Functions();
@@ -50,17 +67,18 @@ int main(int argc, char *argv[]) {
     Statements *statements = parser.statements();
     Token lastToken = tokenizer.getToken();
     if (!lastToken.eof()) {
-        std::cout << "Unexpected token in input." << std::endl;
+        std::cout << "Unexpected token in input:" << std::endl;
         lastToken.print();
         exit(1);
     }
 
     SymTab symTab;
-
-    statements->print();
+	if (verbose) { statements->print(); }
     statements->evaluate(symTab);
-    std::cout << std::endl << "Symbol table contains the following variables.\n";
-    symTab.print();
+	if (verbose == true) {
+		std::cout << std::endl << "The symbol table contains the following variables:\n";
+		symTab.print();
+	}
 
     return 0;
 }

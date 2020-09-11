@@ -1,8 +1,11 @@
 # Python Interpreter
 
+A simple python interpreter written in C++ that mimics Python 2.7
+
 ## Instructions:
   - Compile with ```make``` or ```g++ -std=c++17 *.cpp```
-  - Run with ```./python.exe <filepath>```
+  - Run with ```./python.exe [-v] <filepath>```
+  - ```-v``` is optional, include it to enable verbose mode, mainly for debugging
 
 ## Working features:
   - print()
@@ -18,10 +21,12 @@
 
 ## Planned features:
   - While loops
+  - Control flow statements: break, continue, pass
   - input()
   - Dictionaries
   - Classes
   - Import statements
+  - Lambda functions
   - List slicing
   - List operations: min()/max()/sorted()/sum()
   - round()

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SymTab.hpp"
+#include "Globals.hpp"
 
 SymTab::SymTab() {
     i = 0;
@@ -13,9 +14,11 @@ bool SymTab::isDefined(std::string vName) {
 
 void SymTab::setValueFor(std::string vName, TypeDescriptor* td) {
     // Define a variable by setting its initial value.
-    std::cout << vName << " <- ";
-    td->print();
-    std::cout << std::endl;
+	if (verbose) {
+		std::cout << vName << " <- ";
+		td->print();
+		std::cout << std::endl;
+	}
     if (isDefined(vName)) {
         delete symTabs[i].find(vName)->second;
         symTabs[i].erase(vName);
@@ -25,12 +28,15 @@ void SymTab::setValueFor(std::string vName, TypeDescriptor* td) {
 
 TypeDescriptor* SymTab::getValueFor(std::string vName) {
     if( ! isDefined(vName)) {
-        std::cout << "SymTab::getValueFor: " << vName << " has not been defined.\n";
-        exit(1);
+		std::cout << "SymTab::getValueFor: " << vName << " has not been defined.\n";
+		exit(1);
     }
-    std::cout << "SymTab::getValueFor: " << vName << " contains ";
-    symTabs[i].find(vName)->second->print();
-    std::cout << std::endl;
+	if (verbose) {
+		std::cout << "SymTab::getValueFor: " << vName << " contains "; 
+		symTabs[i].find(vName)->second->print();
+		std::cout << std::endl;
+	}
+
     return symTabs[i].find(vName)->second;
 }
 

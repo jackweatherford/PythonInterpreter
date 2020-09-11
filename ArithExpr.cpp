@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ArithExpr.hpp"
 #include "Functions.hpp"
+#include "Globals.hpp"
 
 void die(std::string where, std::string op, TypeDescriptor::types lType, TypeDescriptor::types rType) {
     std::cout << where << " Unsupported operand types for " << op << ": ";
@@ -55,11 +56,13 @@ TypeDescriptor* InfixExprNode::evaluate(SymTab &symTab) {
     TypeDescriptor::types lType = lValue->type();
     TypeDescriptor* rValue = right()->evaluate(symTab);
     TypeDescriptor::types rType = rValue->type();
-    std::cout << "InfixExprNode::evaluate: ";
-    lValue->print();
-    token().print();
-    rValue->print();
-    std::cout << std::endl;
+	if (verbose) {
+		std::cout << "InfixExprNode::evaluate: ";
+		lValue->print();
+		token().print();
+		rValue->print();
+		std::cout << std::endl;
+	}
     if( token().isAdditionOperator() ) {
         if ( lType == TypeDescriptor::INTEGER && rType == TypeDescriptor::INTEGER )
             return new IntegerDescriptor(dynamic_cast<IntegerDescriptor *>(lValue)->value() +
@@ -184,11 +187,13 @@ TypeDescriptor* RelExprNode::evaluate(SymTab &symTab) {
     TypeDescriptor::types lType = lValue->type();
     TypeDescriptor* rValue = right()->evaluate(symTab);
     TypeDescriptor::types rType = rValue->type();
-    std::cout << "RelExprNode::evaluate: ";
-    lValue->print();
-    token().print();
-    rValue->print();
-    std::cout << std::endl;
+	if (verbose) {
+		std::cout << "RelExprNode::evaluate: ";
+		lValue->print();
+		token().print();
+		rValue->print();
+		std::cout << std::endl;
+	}
     if (token().isGreaterThanOperator()) {
         if ( lType == TypeDescriptor::INTEGER && rType == TypeDescriptor::INTEGER )
             return new IntegerDescriptor(dynamic_cast<IntegerDescriptor*>(lValue)->value() >
@@ -332,11 +337,13 @@ TypeDescriptor* BoolExprNode::evaluate(SymTab &symTab) {
     TypeDescriptor::types lType = lValue->type();
     TypeDescriptor* rValue = right()->evaluate(symTab);
     TypeDescriptor::types rType = rValue->type();
-    std::cout << "BoolExprNode::evaluate: ";
-    lValue->print();
-    token().print();
-    rValue->print();
-    std::cout << std::endl;
+	if (verbose) {
+		std::cout << "BoolExprNode::evaluate: ";
+		lValue->print();
+		token().print();
+		rValue->print();
+		std::cout << std::endl;
+	}
     if (token().isOrOperator()) {
         if ( lType == TypeDescriptor::INTEGER && rType == TypeDescriptor::INTEGER )
             return new IntegerDescriptor(dynamic_cast<IntegerDescriptor*>(lValue)->value() ||
@@ -376,10 +383,12 @@ TypeDescriptor* NotExprNode::evaluate(SymTab &symTab) {
     // evaluates a not expression using a post-order traversal of the expression tree.
     TypeDescriptor* rValue = right()->evaluate(symTab);
     TypeDescriptor::types rType = rValue->type();
-    std::cout << "NotExprNode::evaluate:";
-    token().print();
-    rValue->print();
-    std::cout << std::endl;
+	if (verbose) {
+		std::cout << "NotExprNode::evaluate:";
+		token().print();
+		rValue->print();
+		std::cout << std::endl;
+	}
     if (token().isNotOperator()) {
         if ( rType == TypeDescriptor::INTEGER )
             return new IntegerDescriptor(! dynamic_cast<IntegerDescriptor*>(rValue)->value());
@@ -425,14 +434,18 @@ void Subscription::print() {
 }
 
 TypeDescriptor* Subscription::evaluate(SymTab &symTab) {
-    std::cout << "Subscription::evaluate: ";
+	if (verbose) {
+		std::cout << "Subscription::evaluate: ";
+	}
     TypeDescriptor* subVal = subscript()->evaluate(symTab);
     TypeDescriptor::types subType = subVal->type();
-    token().print();
-    std::cout << '[';
-    subVal->print();
-    std::cout << ']';
-    std::cout << std::endl;
+	if (verbose) {
+		token().print();
+		std::cout << '[';
+		subVal->print();
+		std::cout << ']';
+		std::cout << std::endl;
+	}
     if (token().isName()) {
         if ( subType == TypeDescriptor::INTEGER ) {
             int index = dynamic_cast<IntegerDescriptor*>(subVal)->value();
@@ -449,9 +462,11 @@ TypeDescriptor* Subscription::evaluate(SymTab &symTab) {
                         std::cout << "Subscription::evaluate Index out of bounds, larger than array size" << std::endl;
                         exit(1);
                     }
-                    std::cout << "Subscription::evaluate returning ";
-                    values[index]->print();
-                    std::cout << std::endl;
+					if (verbose) {
+						std::cout << "Subscription::evaluate returning ";
+						values[index]->print();
+						std::cout << std::endl;
+					}
                     return values[index];
                 } else {
                     std::cout << "Subscription::evaluate Can't subscript into a";
@@ -561,8 +576,10 @@ TypeDescriptor* Len::evaluate(SymTab &symTab) {
         exit(1);
     }
     int ret = dynamic_cast<ArrayDescriptor*>(value)->numElements();
-    std::cout << "Len::evaluate: returning ";
-    std::cout << ret << std::endl;
+	if (verbose) {
+		std::cout << "Len::evaluate: returning ";
+		std::cout << ret << std::endl;
+	}
     return new IntegerDescriptor(ret);
 }
 
@@ -574,7 +591,7 @@ void WholeNumber::print() {
 }
 
 TypeDescriptor* WholeNumber::evaluate(SymTab &symTab) {
-    std::cout << "WholeNumber::evaluate: returning " << token().getWholeNumber() << std::endl;
+	if (verbose) { std::cout << "WholeNumber::evaluate: returning " << token().getWholeNumber() << std::endl; }
     return new IntegerDescriptor(token().getWholeNumber());
 }
 
@@ -591,8 +608,10 @@ TypeDescriptor* Variable::evaluate(SymTab &symTab) {
         std::cout << "Variable::evaluate Use of undefined variable, " << token().getName() << std::endl;
         exit(1);
     }
-    std::cout << "Variable::evaluate: returning ";
-    symTab.getValueFor(token().getName());
+    if (verbose) { 
+		std::cout << "Variable::evaluate: returning ";
+		symTab.getValueFor(token().getName());
+	}
     return symTab.getValueFor(token().getName());
 }
 
@@ -604,7 +623,7 @@ void Double::print() {
 }
 
 TypeDescriptor* Double::evaluate(SymTab &symTab) {
-    std::cout << "Double::evaluate: returning " << token().getDouble() << std::endl;
+	if (verbose) { std::cout << "Double::evaluate: returning " << token().getDouble() << std::endl; }
     return new DoubleDescriptor(token().getDouble());
 }
 
@@ -616,6 +635,6 @@ void String::print() {
 }
 
 TypeDescriptor* String::evaluate(SymTab &symTab) {
-    std::cout << "String::evaluate: returning " << token().getString() << std::endl;
+    if (verbose) { std::cout << "String::evaluate: returning " << token().getString() << std::endl; }
     return new StringDescriptor(token().getString());
 }

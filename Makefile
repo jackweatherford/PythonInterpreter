@@ -1,7 +1,7 @@
 .SUFFIXES: .o .cpp .exe
 
 CFLAGS = -ggdb -std=c++17
-objects =  Token.o Tokenizer.o Parser.o ArithExpr.o SymTab.o Statements.o TypeDescriptor.o Range.o Functions.o main.o
+objects = Token.o Tokenizer.o Parser.o ArithExpr.o SymTab.o Statements.o TypeDescriptor.o Range.o Functions.o main.o
 
 python.exe: $(objects)
 	g++ $(CFLAGS) -o python.exe $(objects)
@@ -10,7 +10,7 @@ python.exe: $(objects)
 	g++ $(CFLAGS) -c $< -o $@
 
 
-Token.o:  Token.cpp Token.hpp
+Token.o: Token.cpp Token.hpp
 Tokenizer.o: Tokenizer.cpp Tokenizer.hpp
 ArithExpr.o: ArithExpr.cpp ArithExpr.hpp Token.hpp SymTab.hpp Functions.hpp TypeDescriptor.hpp
 SymTab.o: SymTab.cpp SymTab.hpp TypeDescriptor.hpp

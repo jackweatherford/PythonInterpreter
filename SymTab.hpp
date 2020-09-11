@@ -5,7 +5,6 @@
 #include <map>
 #include "TypeDescriptor.hpp"
 
-
 // This is a flat symbol table. It allows for variables to be
 // initialized, determines if a give variable has been defined or not, and if
 // a variable has been defined, it returns its value.

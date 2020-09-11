@@ -53,7 +53,7 @@ void AssignmentStatement::evaluate(SymTab &symTab) {
         for (int i = 1; i < _rhsArray.size(); i++) {
             val = _rhsArray[i]->evaluate(symTab);
             if (val->type() != arrType) {
-                std::cout << "AssignmentStatement::evaluate Right hand side elements' data types are not homogeneous\n";
+                std::cout << "AssignmentStatement::evaluate Data types of all elements in the right hand side array must be the same\n";
                 exit(1);
             }
             arr.push_back(val);
