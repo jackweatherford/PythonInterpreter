@@ -6,7 +6,7 @@
 
 ## Working features:
   - print()
-  - # Comments
+  - \# Comments
   - Allows for blank lines
   - Assignment statements (variable definitions)
   - Implements the following data types: int, float, str, list
